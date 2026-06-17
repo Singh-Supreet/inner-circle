@@ -1,88 +1,81 @@
 .navbar {
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  z-index: 200;
+  z-index: 100;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  padding: 22px 40px;
-  pointer-events: none;
+  padding: 28px 44px;
 }
 
-.navbar__brand {
+.navbar-left {
   display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  pointer-events: all;
+  align-items: center;
+  gap: 14px;
 }
 
-.navbar__logo {
+.logo-mark {
   flex-shrink: 0;
-  margin-top: 1px;
+  opacity: 0.95;
 }
 
-.navbar__tagline {
+.tagline {
   display: flex;
   flex-direction: column;
-  gap: 0;
-}
-
-.navbar__tagline span {
-  display: block;
-  font-family: 'Barlow', sans-serif;
-  font-size: 10px;
+  font-family: 'Inter', sans-serif;
+  font-size: 9px;
   font-weight: 400;
-  color: white;
-  letter-spacing: 0.04em;
-  line-height: 1.5;
-  opacity: 0.85;
+  line-height: 1.7;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.75;
 }
 
-.navbar__links {
+.nav-links {
   display: flex;
-  gap: 38px;
   list-style: none;
-  pointer-events: all;
-  margin-top: 2px;
+  gap: 40px;
 }
 
-.navbar__links a {
-  font-family: 'Barlow', sans-serif;
-  font-size: 13.5px;
-  font-weight: 400;
+.nav-links a {
   color: white;
   text-decoration: none;
-  letter-spacing: 0.06em;
-  opacity: 0.88;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  opacity: 0.8;
   transition: opacity 0.2s ease;
 }
 
-.navbar__links a:hover {
+.nav-links a:hover {
   opacity: 1;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 768px) {
   .navbar {
-    padding: 18px 24px;
+    padding: 18px 20px;
+    flex-wrap: wrap;
+    gap: 10px;
   }
-  .navbar__links {
-    gap: 24px;
+
+  .nav-links {
+    gap: 18px;
+  }
+
+  .nav-links a {
+    font-size: 11px;
+  }
+
+  .tagline {
+    display: none;
   }
 }
 
-@media (max-width: 600px) {
-  .navbar {
-    padding: 14px 18px;
-  }
-  .navbar__tagline {
-    display: none;
-  }
-  .navbar__links {
-    gap: 16px;
-  }
-  .navbar__links a {
-    font-size: 12px;
+@media (max-width: 480px) {
+  .nav-links {
+    gap: 14px;
   }
 }

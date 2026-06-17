@@ -1,35 +1,27 @@
-*,
-*::before,
-*::after {
+*, *::before, *::after {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
-}
-
-:root {
-  --hero-bg: #df0652;
-  --manifesto-bg: #080810;
-  --font: 'Barlow', sans-serif;
 }
 
 html {
-  scroll-behavior: auto;
+  /* Lenis handles smooth scrolling */
 }
 
 body {
-  font-family: var(--font);
-  background: var(--hero-bg);
+  font-family: 'Inter', system-ui, sans-serif;
+  background: #E11D63;
+  color: #ffffff;
   overflow-x: hidden;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
-#root {
-  width: 100%;
-  min-height: 100vh;
+::-webkit-scrollbar {
+  width: 4px;
 }
-
-.app {
-  position: relative;
-  width: 100%;
+::-webkit-scrollbar-track {
+  background: #c0104e;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
 }

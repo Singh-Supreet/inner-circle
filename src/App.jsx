@@ -1,8 +1,7 @@
 import { useEffect } from 'react'
 import Lenis from 'lenis'
-import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import Navbar from './components/Navbar'
+import gsap from 'gsap'
+import ScrollTrigger from 'gsap/ScrollTrigger'
 import Hero from './components/Hero'
 import Manifesto from './components/Manifesto'
 
@@ -10,11 +9,7 @@ gsap.registerPlugin(ScrollTrigger)
 
 export default function App() {
   useEffect(() => {
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      smoothWheel: true,
-    })
+    const lenis = new Lenis({ lerp: 0.08, smoothWheel: true })
 
     lenis.on('scroll', ScrollTrigger.update)
 
@@ -29,10 +24,9 @@ export default function App() {
   }, [])
 
   return (
-    <div className="app">
-      <Navbar />
+    <main>
       <Hero />
       <Manifesto />
-    </div>
+    </main>
   )
 }
