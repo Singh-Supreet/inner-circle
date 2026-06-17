@@ -99,6 +99,10 @@
   user-select: none;
 }
 
+.headline-letter {
+  display: inline-block;
+}
+
 /* ── Responsive ── */
 @media (max-width: 1024px) {
   .cards-col {

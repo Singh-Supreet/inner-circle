@@ -69,12 +69,6 @@ function BunnyModel({ scrollProgress, mousePos }) {
       baseRef.current.position.x, targetX, delta * 6
     )
 
-    /* ── SCALE ── grows from 1 → 1.45 as it reaches the right ── */
-    const targetSc = 1 + walkT * 0.45
-    baseRef.current.scale.setScalar(
-      THREE.MathUtils.lerp(baseRef.current.scale.x, targetSc, delta * 6)
-    )
-
     /* ── VERTICAL BOB (simulated walk) ── */
     const wEnter = smoothstep(0.2, 0.35, p) * (1 - smoothstep(0.7, 0.82, p))
     const bob = wEnter > 0.01 ? Math.sin(t * 10) * 0.06 * wEnter : 0
@@ -83,44 +77,43 @@ function BunnyModel({ scrollProgress, mousePos }) {
     )
 
     /* ── BASE ROTATION (facing direction) ──
-       0       = facing camera (idle)
-       -π/2    = facing right  (walking)
-       -3π/2   = facing left   (pointing) — continued clockwise spin */
+       0      = facing camera (idle)
+       +π/2   = facing right  (walking)
+       +3π/2  = facing left, toward cards-col — continued spin */
     let targetBaseY = 0
     if (p >= 0.2 && p < 0.75) {
-      targetBaseY = -Math.PI * 0.5 * smoothstep(0.2, 0.36, p)
+      targetBaseY = Math.PI * 0.5 * smoothstep(0.2, 0.36, p)
     } else if (p >= 0.75) {
-      targetBaseY = -Math.PI * 0.5 - Math.PI * smoothstep(0.75, 0.93, p)
+      targetBaseY = Math.PI * 0.5 + Math.PI * smoothstep(0.75, 0.93, p)
     }
     baseRef.current.rotation.y = THREE.MathUtils.lerp(
       baseRef.current.rotation.y, targetBaseY, delta * 3
     )
 
     /* ── PROCEDURAL POINTING via bones ──
-       Model faces left at p≥0.75. The "right" arm (Bip001_R_*)
-       extends toward the viewer's left = toward the cards.
-       Biped bone naming: Bip001_R_UpperArm_0XX, Bip001_R_Forearm_0XX  */
+       Model faces left (toward cards-col) at p≥0.75. Once turned, the
+       L-side limb lands on the camera-facing side (verified from
+       bind-pose bone offsets), so it's the one that reads as pointing
+       at the cards instead of being hidden behind the torso.
+       Bone names use spaces, not underscores: "Bip001 L UpperArm_013" */
     const bones   = boneRef.current
     const pointT  = smoothstep(0.78, 0.96, p)
-    const resetT  = 1 - pointT
 
-    // Find right-arm bones by partial name match
-    const rUp   = Object.values(bones).find(b => b.name.includes('R_UpperArm'))
-    const rFore = Object.values(bones).find(b => b.name.includes('R_Forearm'))
-    const rHand = Object.values(bones).find(b => b.name.includes('R_Hand'))
+    const lUp   = Object.values(bones).find(b => b.name.includes('L UpperArm'))
+    const lFore = Object.values(bones).find(b => b.name.includes('L Forearm'))
+    const lHand = Object.values(bones).find(b => b.name.includes('L Hand'))
     // Also get spine for a slight lean-back pose while pointing
-    const spine = bones['Bip001_Spine_02']
+    const spine = bones['Bip001 Spine_02']
 
-    if (rUp) {
-      // Biped R arm: raise and extend to point toward screen-left
-      rUp.rotation.z = THREE.MathUtils.lerp(rUp.rotation.z, pointT * -1.1,  delta * 4)
-      rUp.rotation.y = THREE.MathUtils.lerp(rUp.rotation.y, pointT * -0.3,  delta * 4)
+    if (lUp) {
+      lUp.rotation.z = THREE.MathUtils.lerp(lUp.rotation.z, pointT * -1.1,  delta * 4)
+      lUp.rotation.y = THREE.MathUtils.lerp(lUp.rotation.y, pointT * -0.3,  delta * 4)
     }
-    if (rFore) {
-      rFore.rotation.y = THREE.MathUtils.lerp(rFore.rotation.y, pointT * -0.3, delta * 4)
+    if (lFore) {
+      lFore.rotation.y = THREE.MathUtils.lerp(lFore.rotation.y, pointT * -0.3, delta * 4)
     }
-    if (rHand) {
-      rHand.rotation.z = THREE.MathUtils.lerp(rHand.rotation.z, pointT * 0.15, delta * 4)
+    if (lHand) {
+      lHand.rotation.z = THREE.MathUtils.lerp(lHand.rotation.z, pointT * 0.15, delta * 4)
     }
     if (spine) {
       // Slight chest lean toward the pointing direction

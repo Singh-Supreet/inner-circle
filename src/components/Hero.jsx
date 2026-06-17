@@ -110,10 +110,13 @@ function Mandala({ svgRef }) {
   )
 }
 
+const HEADLINE = 'INNER CIRCLE'
+
 export default function Hero() {
   const wrapperRef     = useRef()
   const mandalRef      = useRef()
   const cardsRef       = useRef([])
+  const lettersRef     = useRef([])
   const scrollProgress = useRef(0)
   const mousePos       = useRef({ x: 0, y: 0 })
 
@@ -176,6 +179,36 @@ export default function Hero() {
     return () => ScrollTrigger.getAll().forEach(t => t.kill())
   }, [])
 
+  /* ── headline letters drop & fade as the bunny walks ──
+     Scoped to the same scroll window as the bunny's walk (20%→75%),
+     so the last letter is gone right as it reaches the right side.
+     Pixel-based start/end: GSAP's "20% top" means 20% of the trigger's
+     own height, not 20% of the scrollable range — using the same math
+     as the scrollProgress handler above keeps this in sync with it. */
+  useEffect(() => {
+    const letters = lettersRef.current.filter(Boolean)
+    const scrollRange = () => wrapperRef.current.offsetHeight - window.innerHeight
+
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger:  wrapperRef.current,
+        start:    () => wrapperRef.current.offsetTop + 0.2  * scrollRange(),
+        end:      () => wrapperRef.current.offsetTop + 0.75 * scrollRange(),
+        scrub:    true,
+        invalidateOnRefresh: true,
+      },
+    })
+
+    tl.to(letters, {
+      y:        50,
+      opacity:  0,
+      stagger:  0.06,
+      ease:     'power1.in',
+    })
+
+    return () => ScrollTrigger.getAll().forEach(t => t.kill())
+  }, [])
+
   return (
     <section ref={wrapperRef} className="hero-wrapper" id="hero">
       <div className="hero-sticky">
@@ -205,7 +238,21 @@ export default function Hero() {
 
         {/* Edge-to-edge headline */}
         <div className="headline-wrap" aria-label="Inner Circle">
-          <p className="headline">INNER CIRCLE</p>
+          <p className="headline">
+            {HEADLINE.split('').map((char, i) => (
+              char === ' '
+                ? <span key={i} className="headline-space">&nbsp;</span>
+                : (
+                  <span
+                    key={i}
+                    ref={el => { lettersRef.current[i] = el }}
+                    className="headline-letter"
+                  >
+                    {char}
+                  </span>
+                )
+            ))}
+          </p>
         </div>
       </div>
     </section>
