@@ -1,0 +1,177 @@
+.manifesto {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  min-height: 600px;
+  background: #000000;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Thin magenta top edge — visible during hero→manifesto transition */
+.manifesto::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, #dc0f5b 20%, #dc0f5b 80%, transparent 100%);
+  z-index: 10;
+  opacity: 0.7;
+}
+
+/* ── Drag pill ── */
+.manifesto__pill {
+  width: 36px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  margin: 14px auto 0;
+  flex-shrink: 0;
+}
+
+/* ── Main body (text + character) ── */
+.manifesto__body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 0 5% 0 7%;
+  gap: 0;
+  overflow: hidden;
+}
+
+/* ── Scroll-reveal text ── */
+.manifesto__text {
+  flex: 0 0 48%;
+  max-width: 560px;
+}
+
+.manifesto__text p {
+  font-family: 'Barlow', sans-serif;
+  font-size: clamp(15px, 1.55vw, 22px);
+  font-weight: 300;
+  line-height: 1.75;
+  color: white;
+  white-space: pre-wrap;
+}
+
+.manifesto__text span {
+  opacity: 0.07;
+  transition: opacity 0.05s linear;
+  display: inline;
+}
+
+.manifesto__text span.bold {
+  font-weight: 600;
+}
+
+/* ── Bike character ── */
+.manifesto__character {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 3%;
+  height: 100%;
+}
+
+.bike-canvas {
+  height: min(82vh, 700px);
+  width: auto;
+  mix-blend-mode: screen;
+  display: block;
+  pointer-events: none;
+}
+
+/* ── Logo marquee ── */
+.manifesto__marquee {
+  flex-shrink: 0;
+  width: 100%;
+  overflow: hidden;
+  padding: 14px 0 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  mask-image: linear-gradient(90deg, transparent 0%, black 8%, black 92%, transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, black 8%, black 92%, transparent 100%);
+}
+
+.marquee__track {
+  display: flex;
+  gap: 0;
+  width: max-content;
+  animation: marquee 28s linear infinite;
+}
+
+.marquee__item {
+  font-family: 'Barlow', sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.38);
+  letter-spacing: 0.05em;
+  padding: 0 44px;
+  white-space: nowrap;
+  transition: color 0.3s ease;
+}
+
+.marquee__item:hover {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* ── Mobile ── */
+@media (max-width: 900px) {
+  .manifesto__body {
+    flex-direction: column;
+    padding: 20px 6% 0;
+    gap: 0;
+    align-items: flex-start;
+  }
+
+  .manifesto__text {
+    flex: 0 0 auto;
+    max-width: 100%;
+    order: 2;
+  }
+
+  .manifesto__text p {
+    font-size: clamp(13px, 3.4vw, 17px);
+    line-height: 1.65;
+  }
+
+  .manifesto__character {
+    flex: 0 0 auto;
+    order: 1;
+    justify-content: center;
+    width: 100%;
+    height: 30vh;
+    padding: 0;
+  }
+
+  .bike-img {
+    height: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .manifesto__body {
+    padding: 14px 5% 0;
+  }
+
+  .manifesto__character {
+    height: 24vh;
+  }
+
+  .manifesto__text p {
+    font-size: 13px;
+  }
+
+  .marquee__item {
+    font-size: 13px;
+    padding: 0 30px;
+  }
+}

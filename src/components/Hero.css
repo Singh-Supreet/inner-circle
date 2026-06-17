@@ -1,0 +1,180 @@
+.hero {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  min-height: 600px;
+  background: #df0652;
+  overflow: hidden;
+}
+
+/* ── Rotating calligraphic mandala ── */
+.hero__mandala {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 145vmax;
+  height: 145vmax;
+  margin-top: -72.5vmax;
+  margin-left: -72.5vmax;
+  background: url('/hero_mandala.jpg') center center / cover no-repeat;
+  border-radius: 50%;
+  z-index: 1;
+  opacity: 0.9;
+  animation: mandala-spin 90s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes mandala-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* ── Character layer ── */
+.hero__character {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  will-change: transform;
+  pointer-events: none;
+}
+
+.hero__pose {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+
+.hero__pose img {
+  height: min(88vh, 780px);
+  width: auto;
+  max-width: none;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Pointing pose: bunny rendered in right half of image — right-align to dock it right */
+.hero__pose--pointing {
+  opacity: 0;
+  justify-content: flex-end;
+}
+
+.hero__pose--pointing img {
+  height: min(94vh, 840px);
+}
+
+/* ── Feature cards ── */
+.hero__cards {
+  position: absolute;
+  left: 5%;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  z-index: 4;
+}
+
+.hero__card {
+  background: #ffffff;
+  border-radius: 60px;
+  padding: 17px 38px;
+  min-width: 285px;
+  opacity: 0;
+  box-shadow: 0 6px 28px rgba(0, 0, 0, 0.14);
+  cursor: default;
+}
+
+.hero__card span {
+  font-family: 'Barlow', sans-serif;
+  font-size: 16.5px;
+  font-weight: 400;
+  color: #111;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+/* ── Headline ── */
+.hero__headline {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  overflow: hidden;
+}
+
+.hero__headline h1 {
+  font-family: 'Barlow', sans-serif;
+  font-size: clamp(4.5rem, 10.5vw, 15rem);
+  font-weight: 100;
+  color: white;
+  letter-spacing: 0.08em;
+  line-height: 0.86;
+  text-align: center;
+  white-space: nowrap;
+  text-transform: uppercase;
+  padding: 0 0.5%;
+}
+
+/* ── Mobile ── */
+@media (max-width: 900px) {
+  .hero__pose img {
+    height: min(58vh, 480px);
+  }
+
+  .hero__pose--pointing img {
+    height: min(62vh, 520px);
+  }
+
+  .hero__cards {
+    left: 50%;
+    top: auto;
+    bottom: 14%;
+    transform: translateX(-50%);
+    align-items: center;
+  }
+
+  .hero__card {
+    min-width: 260px;
+    padding: 14px 28px;
+    border-radius: 16px;
+  }
+
+  .hero__headline h1 {
+    font-size: clamp(3rem, 11vw, 6rem);
+  }
+}
+
+@media (max-width: 480px) {
+  .hero__pose img {
+    height: 48vh;
+  }
+
+  .hero__pose--pointing img {
+    height: 52vh;
+  }
+
+  .hero__cards {
+    bottom: 12%;
+    gap: 10px;
+  }
+
+  .hero__card {
+    min-width: 220px;
+    padding: 12px 22px;
+    border-radius: 12px;
+  }
+
+  .hero__card span {
+    font-size: 14px;
+  }
+
+  .hero__headline h1 {
+    font-size: clamp(2.6rem, 13vw, 5rem);
+    letter-spacing: 0.04em;
+  }
+}
