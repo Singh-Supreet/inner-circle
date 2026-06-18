@@ -53,7 +53,7 @@ Node ≥ 18 required.
 
 ## Tradeoffs and known decisions
 
-- **Bone names are model-specific**: the procedural walk and point animations in `BunnyScene.jsx` search for bones by substring (`L Clavicle`, `R Thigh`, etc.). If the GLB changes, bone lookups may miss and the character falls back to a static pose.
+
 - **Horse as manifesto character**: the brief calls for an exercise-bike character. A horse GLB was used as a placeholder; the procedural gait animation (trot cycle, tail wave) demonstrates the same capability.
 - **1000 vh hero runway**: generous scroll space makes the bunny animation feel deliberate but means the user has to scroll a long way on desktop. A shorter runway (≈ 500 vh) with a faster scrub would reduce fatigue with more time to tune.
 - **`ScrollTrigger.normalizeScroll`** was intentionally removed — it conflicts with Lenis since both normalise the scroll event stream.
