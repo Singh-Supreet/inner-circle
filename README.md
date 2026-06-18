@@ -1,6 +1,6 @@
 # Inner Circle — LunaZone Front-End Assignment
 
-Live demo: _(deploy URL here)_
+Live demo: [_(deploy URL here)_](https://inner-circle-ochre-chi.vercel.app/)
 
 ## Stack
 
