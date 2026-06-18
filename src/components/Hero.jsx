@@ -6,18 +6,9 @@ import BunnyScene from './BunnyScene'
 import './Hero.css'
 
 const CARDS = [
-  {
-    title: 'Private Discord & Networking',
-    body: 'An invite-only community of builders, traders, and operators moving at the front of web3.',
-  },
-  {
-    title: 'Weekly Market Alpha Drops',
-    body: 'Curated on-chain signals, early-mover plays, and research delivered every week.',
-  },
-  {
-    title: 'Exclusive Web3 Tooling Access',
-    body: 'Premium dashboards, scripts, and resources not available to the general public.',
-  },
+  { title: 'Private Discord & Networking' },
+  { title: 'Weekly Market Alpha Drops' },
+  { title: 'Exclusive Web3 Tooling Access' },
 ]
 
 /* ── SVG mandala background ── */
@@ -66,7 +57,7 @@ function Mandala({ svgRef }) {
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
     >
-      <g stroke="white">
+      <g stroke="#ff6699">
         {/* concentric rings */}
         {[70, 130, 190, 240, 300, 340].map(r => (
           <circle key={r} cx={cx} cy={cy} r={r}
@@ -154,59 +145,89 @@ export default function Hero() {
     return () => window.removeEventListener('mousemove', onMove)
   }, [])
 
-  /* ── cards scroll reveal (staggered, reversible) ── */
+  /* ── cards scroll reveal (staggered, reversible) ──
+     On mobile: cards are always visible below the character — no scroll trigger.
+     On desktop: bunny turn runs p=0.75→0.93; cards slide in after. */
   useEffect(() => {
     const cards = cardsRef.current.filter(Boolean)
+
+    if (window.innerWidth < 768) {
+      gsap.set(cards, { y: 40, opacity: 0 })
+
+      const ctx = gsap.context(() => {
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: wrapperRef.current,
+            start:   '10% top',
+            end:     '20% top',
+            scrub:   0.6,
+          },
+        })
+        tl.to(cards, {
+          y:        0,
+          opacity:  1,
+          duration: 1,
+          stagger:  0.5,
+          ease:     'power2.out',
+        })
+      })
+
+      return () => ctx.revert()
+    }
+
     gsap.set(cards, { x: -70, opacity: 0 })
 
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger:       wrapperRef.current,
-        start:         '68% top',
-        end:           '82% top',
-        toggleActions: 'play none none reverse',
-      },
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger:       wrapperRef.current,
+          start:         '78% top',
+          end:           '83% top',
+          toggleActions: 'play none none reverse',
+        },
+      })
+
+      tl.to(cards, {
+        x:        0,
+        opacity:  1,
+        duration: 0.65,
+        stagger:  0.18,
+        ease:     'power3.out',
+      })
     })
 
-    tl.to(cards, {
-      x:        0,
-      opacity:  1,
-      duration: 0.65,
-      stagger:  0.18,
-      ease:     'power3.out',
-    })
-
-    return () => ScrollTrigger.getAll().forEach(t => t.kill())
+    return () => ctx.revert()
   }, [])
 
   /* ── headline letters drop & fade as the bunny walks ──
-     Scoped to the same scroll window as the bunny's walk (20%→75%),
-     so the last letter is gone right as it reaches the right side.
-     Pixel-based start/end: GSAP's "20% top" means 20% of the trigger's
-     own height, not 20% of the scrollable range — using the same math
-     as the scrollProgress handler above keeps this in sync with it. */
+     Skipped on mobile — bunny stays still so letters should remain visible.
+     On desktop: scoped to the walk scroll window (20%→75%). */
   useEffect(() => {
+    if (window.innerWidth < 768) return
+
     const letters = lettersRef.current.filter(Boolean)
     const scrollRange = () => wrapperRef.current.offsetHeight - window.innerHeight
 
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger:  wrapperRef.current,
-        start:    () => wrapperRef.current.offsetTop + 0.2  * scrollRange(),
-        end:      () => wrapperRef.current.offsetTop + 0.75 * scrollRange(),
-        scrub:    true,
-        invalidateOnRefresh: true,
-      },
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger:  wrapperRef.current,
+          start:    () => wrapperRef.current.offsetTop + 0.2  * scrollRange(),
+          end:      () => wrapperRef.current.offsetTop + 0.75 * scrollRange(),
+          scrub:    true,
+          invalidateOnRefresh: true,
+        },
+      })
+
+      tl.to(letters, {
+        y:        50,
+        opacity:  0,
+        stagger:  0.06,
+        ease:     'power1.in',
+      })
     })
 
-    tl.to(letters, {
-      y:        50,
-      opacity:  0,
-      stagger:  0.06,
-      ease:     'power1.in',
-    })
-
-    return () => ScrollTrigger.getAll().forEach(t => t.kill())
+    return () => ctx.revert()
   }, [])
 
   return (
@@ -228,10 +249,11 @@ export default function Hero() {
             <div
               key={card.title}
               ref={el => { cardsRef.current[i] = el }}
-              className="feature-card"
+              className="feature-card-wrap"
             >
-              <h3 className="card-title">{card.title}</h3>
-              <p className="card-body">{card.body}</p>
+              <div className="feature-card">
+                <h3 className="card-title">{card.title}</h3>
+              </div>
             </div>
           ))}
         </div>

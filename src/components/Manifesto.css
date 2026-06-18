@@ -1,130 +1,216 @@
 .manifesto {
   min-height: 100vh;
-  background: #12000a;
+  background: #0A0A0A;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 100px 40px;
+  justify-content: space-between;
+  flex-direction: column;
   position: relative;
   overflow: hidden;
+  z-index: 10;
+  margin-top: -100vh;
+  border-radius: 32px 32px 0 0;
+  box-shadow: 0 -32px 80px rgba(0, 0, 0, 0.6);
+  will-change: transform;
 }
 
-/* Faint radial glow behind content */
+/* Radial magenta glow */
 .manifesto::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse 70% 60% at 50% 50%, rgba(225, 29, 99, 0.14) 0%, transparent 70%);
+  background: radial-gradient(ellipse 70% 50% at 50% 30%, rgba(225, 29, 99, 0.09) 0%, transparent 70%);
   pointer-events: none;
+  z-index: 0;
 }
 
-.manifesto-inner {
-  max-width: 720px;
-  width: 100%;
+/* Thin magenta accent line at top edge — visible during transition from hero */
+.manifesto::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 8%;
+  right: 8%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(225, 29, 99, 0.9) 35%,
+    rgba(225, 29, 99, 0.9) 65%,
+    transparent 100%
+  );
+}
+
+/* ── Pill ── */
+.manifesto-pill {
+  width: 44px;
+  height: 5px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.16);
+  margin: 18px auto 0;
+  flex-shrink: 0;
   position: relative;
   z-index: 1;
 }
 
-/* Badge */
-.manifesto-badge {
-  display: flex;
+/* ── Inner two-column layout ── */
+.manifesto-inner {
+  display:grid;
+  grid-template-columns: 52% 1fr;
   align-items: center;
-  gap: 14px;
-  margin-bottom: 52px;
-  will-change: transform, opacity;
+  padding: 48px 72px 0px;
+  gap: 48px;
+  position: relative;
+  z-index: 1;
 }
 
-.manifesto-label {
-  font-family: 'Inter', sans-serif;
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.55);
-}
-
-/* Lines list */
-.manifesto-lines {
-  list-style: none;
+/* ── Text column ── */
+.manifesto-text-col {
+  flex: 0 0 52%;
   display: flex;
   flex-direction: column;
-  gap: 0;
-  margin-bottom: 64px;
+  gap: 100px;
 }
 
-.manifesto-line {
+/* Fixed-height viewport window with top/bottom fade mask */
+.manifesto-para-window {
+  position: relative;
+  height: 58vh;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0,0,0,0.6) 12%,
+    black 28%,
+    black 72%,
+    rgba(0,0,0,0.6) 88%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0,0,0,0.6) 12%,
+    black 28%,
+    black 72%,
+    rgba(0,0,0,0.6) 88%,
+    transparent 100%
+  );
+}
+
+
+/* Translating inner list — positioned by JS */
+.manifesto-paragraphs {
   display: flex;
-  align-items: baseline;
-  gap: 20px;
-  padding: 16px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  will-change: transform, opacity;
+  flex-direction: column;
+  gap: 26px;
+  will-change: transform;
 }
 
-.manifesto-line:first-child {
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+
+
+.manifesto-para {
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-size: clamp(14px, 1.35vw, 17px);
+  line-height: 1.85;
+  color: #ffffff;
+  will-change: opacity, filter, transform;
 }
 
-.line-num {
-  font-family: 'Barlow', sans-serif;
+/* Bold phrases stay brightest — inherit full white at any opacity level */
+.manifesto-para strong {
+  font-weight: 700;
+  color: #ffffff;
+}
+
+/* ── Model column ── */
+.manifesto-model-col {
+  flex: 1;
+  position: relative;
+  align-self: stretch;
+  min-height: 420px;
+}
+
+/* ── Logo marquee ── */
+.manifesto-marquee-wrap {
+  height: 60px;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  z-index: 1;
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.45), transparent);
+}
+
+.manifesto-marquee {
+  display: flex;
+  align-items: center;
+  gap: 60px;
+  width: max-content;
+  animation: m-scroll 24s linear infinite;
+  padding: 0 30px;
+}
+
+.manifesto-logo-item {
   font-size: 11px;
-  font-weight: 300;
-  letter-spacing: 0.08em;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
   color: rgba(255, 255, 255, 0.28);
-  min-width: 36px;
+  white-space: nowrap;
   flex-shrink: 0;
 }
 
-.line-text {
-  font-family: 'Barlow', sans-serif;
-  font-size: clamp(24px, 4.2vw, 48px);
-  font-weight: 300;
-  line-height: 1.25;
-  color: rgba(255, 255, 255, 0.92);
-  letter-spacing: -0.01em;
-}
-
-/* CTA */
-.manifesto-cta {
-  font-family: 'Inter', sans-serif;
-  font-size: 14px;
-  font-weight: 400;
-  color: rgba(255, 255, 255, 0.45);
-  letter-spacing: 0.01em;
-}
-
-.cta-link {
-  color: #ff4d94;
-  text-decoration: none;
-  font-weight: 500;
-  transition: color 0.2s ease;
-}
-
-.cta-link:hover {
-  color: #ff80b4;
+@keyframes m-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
 
 /* ── Responsive ── */
-@media (max-width: 768px) {
-  .manifesto {
-    padding: 80px 24px;
+@media (max-width: 900px) {
+  .manifesto-inner {
+    flex-direction: column-reverse;
+    padding: 32px 24px 0px;
+    gap: 24px;
+    align-items: stretch;
+    display: flex;
   }
 
-  .manifesto-line {
-    gap: 14px;
-    padding: 14px 0;
+  .manifesto-model-col {
+    flex: 0 0 auto;
+    width: 100%;
+    height: 300px;
+    min-height: unset;
+    align-self: auto;
   }
 
-  .line-num {
-    min-width: 28px;
-    font-size: 10px;
+  .manifesto-text-col {
+    flex: unset;
+    gap: 16px;
   }
 
-  .manifesto-badge {
-    margin-bottom: 40px;
+  .manifesto-para-window {
+    height: 42vh;
   }
 
-  .manifesto-cta {
+  .manifesto-para {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .manifesto-inner {
+    padding: 20px 16px 0px;
+    gap: 16px;
+  }
+
+  .manifesto-model-col {
+    height: 240px;
+  }
+
+  .manifesto-para-window {
+    height: 38vh;
+  }
+
+  .manifesto-para {
     font-size: 13px;
   }
 }
