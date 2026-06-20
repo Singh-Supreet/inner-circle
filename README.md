@@ -26,10 +26,10 @@ Node ≥ 18 required.
 ## What's built
 
 ### Hero section
-- Sticky scroll container (1000 vh runway) so animations have room to breathe.
+- Sticky scroll container (500 vh runway) so animations have room to breathe.
 - SVG mandala background — counter-rotates on mousemove via GSAP.
-- 3D bunny character (`bunny_character.glb`) rendered with React Three Fiber. Mouse parallax tilts the character; on scroll it walks right (~20–75% progress), turns, and extends an arm toward the feature cards (~75–93%).
-- Three feature cards slide in from the left via GSAP once the bunny is pointing. On mobile they're always visible stacked below the character.
+- 3D character (`balkan_romanov.glb`) rendered with React Three Fiber. Mouse parallax tilts the character; on scroll it walks right, turns to face the feature cards, then raises its right arm and curls its fingers into a point. The whole sequence is timed off scroll-fraction breakpoints in `src/heroTimeline.js` (walk → turn → point → cards-revealed → scroll buffer), the single source of truth both `CharacterScene` (3D animation) and `Hero` (headline fade, card reveal) read from, so the two can't drift out of sync.
+- Three feature cards scroll-scrub in from the left (not a fixed-duration tween) as soon as the turn finishes, alongside the point gesture. On mobile they're always visible stacked below the character.
 - "INNER CIRCLE" edge-to-edge outline headline at the bottom, letters fade out during the walk scroll window.
 
 ### Manifesto section
@@ -39,7 +39,7 @@ Node ≥ 18 required.
 - Dark background lifts over the hero via `margin-top: -100vh` + `border-radius` so the transition feels like a card sliding up.
 
 ### Responsiveness
-- **≤ 768 px**: hero runway shortened to 250 vh; bunny stays centred (no walk); feature cards stack full-width below the character; tagline hidden from navbar.
+- **≤ 768 px**: hero runway shortened to 250 vh; character is fully static (no walk, no turn, no point gesture — stays centred facing camera); feature cards stack full-width below the character; tagline hidden from navbar.
 - **≤ 900 px (manifesto)**: two-column grid collapses to single column — horse model moves above the text.
 - Mouse parallax is passive (`mousemove`) — effectively a no-op on touch devices where no cursor exists.
 
@@ -49,19 +49,18 @@ Node ≥ 18 required.
 
 **Lenis** — replaces the browser's native scroll inertia with a configurable spring (`lerp: 0.08`). Pairs cleanly with GSAP by forwarding each RAF tick: `lenis.on('scroll', ScrollTrigger.update)`. Choosing Lenis over ScrollSmoother (GSAP Club) keeps the bundle free of a paid dependency while achieving the same feel.
 
-**React Three Fiber + Drei** — declarative Three.js inside React with automatic resize handling, shadow maps, and `useFrame` for per-frame procedural bone animation. Drei's `useGLTF` preloads the model and draco-decompresses it; `useAnimations` wires up any embedded clips automatically.
+**React Three Fiber + Drei** — declarative Three.js inside React with automatic resize handling, shadow maps, and `useFrame` for per-frame procedural bone animation. Drei's `useGLTF` preloads the model and draco-decompresses it. Both characters skip embedded clips entirely in favour of procedural bone-driven animation — `balkan_romanov.glb` ships 22 baked animation tracks, but all of them have zero leg rotation (they're pose/variant previews from the source asset tool, not real walk cycles), so `useAnimations` wouldn't have helped here anyway.
 
 ## Tradeoffs and known decisions
 
 
 - **Horse as manifesto character**: the brief calls for an exercise-bike character. A horse GLB was used as a placeholder; the procedural gait animation (trot cycle, tail wave) demonstrates the same capability.
-- **1000 vh hero runway**: generous scroll space makes the bunny animation feel deliberate but means the user has to scroll a long way on desktop. A shorter runway (≈ 500 vh) with a faster scrub would reduce fatigue with more time to tune.
+- **Bone rotations are layered on rest pose, never overwritten**: both `balkan_romanov.glb` and `horse.glb` author their bones at non-identity rest rotations (one bone sits ~165° off identity in its bind pose). Every procedural rotation in `CharacterScene`/`Manifesto` captures each bone's rest value once, then adds the animated offset on top — overwriting `rotation.x/y/z` outright snaps the limb out of its bind pose.
 - **`ScrollTrigger.normalizeScroll`** was intentionally removed — it conflicts with Lenis since both normalise the scroll event stream.
 
 ## What I'd improve with more time
 
-1. **Tighter scroll runway** (~400–500 vh) with tuned easing so the hero animations feel snappier.
-2. **Actual exercise-bike model** — a looping pedalling animation would match the brief exactly and could be driven by the manifesto `scrollProgress` ref.
-3. **Entrance animation on page load** — bunny + mandala fade/scale in from centre on first paint.
-4. **Cursor follow dot** — a custom trailing cursor that reacts to hover states.
-5. **Deployment via Vercel with `vite build` caching** and `Cache-Control` headers on the GLB files (currently ~4 MB each).
+1. **Actual exercise-bike model** — a looping pedalling animation would match the brief exactly and could be driven by the manifesto `scrollProgress` ref.
+2. **Entrance animation on page load** — character + mandala fade/scale in from centre on first paint.
+3. **Cursor follow dot** — a custom trailing cursor that reacts to hover states.
+4. **Shrink `balkan_romanov.glb`** (currently 37 MB — `horse.glb` is 3.3 MB by comparison) via Draco/Meshopt compression and texture downsizing, then deploy via Vercel with `vite build` caching and `Cache-Control` headers on both GLB files.

@@ -2,7 +2,8 @@ import { useRef, useEffect } from 'react'
 import gsap from 'gsap'
 import ScrollTrigger from 'gsap/ScrollTrigger'
 import Navbar from './Navbar'
-import BunnyScene from './BunnyScene'
+import CharacterScene from './CharacterScene'
+import { HERO_TIMELINE as HT } from '../heroTimeline'
 import './Hero.css'
 
 const CARDS = [
@@ -147,7 +148,8 @@ export default function Hero() {
 
   /* ── cards scroll reveal (staggered, reversible) ──
      On mobile: cards are always visible below the character — no scroll trigger.
-     On desktop: bunny turn runs p=0.75→0.93; cards slide in after. */
+     On desktop: cards slide in as soon as the turn completes (HT.turnEnd),
+     alongside the point gesture (see src/heroTimeline.js). */
   useEffect(() => {
     const cards = cardsRef.current.filter(Boolean)
 
@@ -177,20 +179,39 @@ export default function Hero() {
 
     gsap.set(cards, { x: -70, opacity: 0 })
 
+    // Same basis as scrollProgress (p) in the effect above: offsetTop +
+    // fraction * (offsetHeight - viewportHeight). GSAP's "X% top" shorthand
+    // computes against the FULL trigger height instead, which doesn't match
+    // p and quietly eats almost the entire buffer before Manifesto — with a
+    // 500vh wrapper that mismatch was the actual bug, not just a rounding
+    // error (GSAP's "78% top" landed at 390vh while Manifesto starts at the
+    // p=1.0 point, 400vh — a 10vh margin that scroll momentum swallows whole).
+    const cardsScrollRange = () => wrapperRef.current.offsetHeight - window.innerHeight
+
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({
         scrollTrigger: {
-          trigger:       wrapperRef.current,
-          start:         '78% top',
-          end:           '83% top',
-          toggleActions: 'play none none reverse',
+          // Cards reveal as soon as the turn finishes (HT.turnEnd) — same
+          // breakpoint CharacterScene uses for targetBaseY, so this can't
+          // drift out of sync with the turn timing. Finishes at HT.cardsEnd,
+          // well before Manifesto starts at p=1.0.
+          // scrub (not toggleActions) ties the reveal directly to scroll
+          // position — a fixed-duration "play" tween can be outrun by a
+          // fast scroll (e.g. a Lenis-momentum flick), reaching Manifesto
+          // before the cards finish animating in. scrub makes that impossible:
+          // the cards are guaranteed fully shown by the time scroll reaches `end`.
+          trigger:  wrapperRef.current,
+          start:    () => wrapperRef.current.offsetTop + HT.turnEnd  * cardsScrollRange(),
+          end:      () => wrapperRef.current.offsetTop + HT.cardsEnd * cardsScrollRange(),
+          scrub:    true,
+          invalidateOnRefresh: true,
         },
       })
 
       tl.to(cards, {
         x:        0,
         opacity:  1,
-        duration: 0.65,
+        duration: 1,
         stagger:  0.18,
         ease:     'power3.out',
       })
@@ -199,9 +220,9 @@ export default function Hero() {
     return () => ctx.revert()
   }, [])
 
-  /* ── headline letters drop & fade as the bunny walks ──
-     Skipped on mobile — bunny stays still so letters should remain visible.
-     On desktop: scoped to the walk scroll window (20%→75%). */
+  /* ── headline letters drop & fade as the character walks ──
+     Skipped on mobile — character stays still so letters should remain visible.
+     On desktop: scoped to the walk scroll window (HT.walkStart→HT.walkEnd). */
   useEffect(() => {
     if (window.innerWidth < 768) return
 
@@ -212,8 +233,8 @@ export default function Hero() {
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger:  wrapperRef.current,
-          start:    () => wrapperRef.current.offsetTop + 0.2  * scrollRange(),
-          end:      () => wrapperRef.current.offsetTop + 0.75 * scrollRange(),
+          start:    () => wrapperRef.current.offsetTop + HT.walkStart * scrollRange(),
+          end:      () => wrapperRef.current.offsetTop + HT.walkEnd   * scrollRange(),
           scrub:    true,
           invalidateOnRefresh: true,
         },
@@ -240,10 +261,10 @@ export default function Hero() {
           <Mandala svgRef={mandalRef} />
         </div>
 
-        {/* 3D canvas – pointer-events:none set inside BunnyScene */}
-        <BunnyScene scrollProgress={scrollProgress} mousePos={mousePos} />
+        {/* 3D canvas – pointer-events:none set inside CharacterScene */}
+        <CharacterScene scrollProgress={scrollProgress} mousePos={mousePos} />
 
-        {/* Feature cards – slide in from left when bunny points */}
+        {/* Feature cards – slide in from left when the character points */}
         <div className="cards-col">
           {CARDS.map((card, i) => (
             <div

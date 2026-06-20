@@ -1,6 +1,12 @@
-/* ── Hero wrapper – creates the scroll runway ── */
+/* ── Hero wrapper – creates the scroll runway ──
+   This height is the distance the user has to scroll while the section is
+   pinned (see .hero-sticky below) — it's what the walk → turn → point →
+   cards sequence in CharacterScene/Hero plays out across. The breakpoints
+   driving that sequence (src/heroTimeline.js) are scroll-fractions (0→1),
+   so they scale automatically with this number — raise it to slow the
+   whole sequence down, lower it to speed it up. */
 .hero-wrapper {
-  height: 1000vh; /* tall so the animation has room to breathe */
+  height: 500vh;
   position: relative;
   z-index: 1;
 }
@@ -124,7 +130,7 @@
   }
 
   /* Character is auto-fit to viewport height — it stays centered since
-     walkMax is capped at 0.35 in BunnyScene for narrow viewports. */
+     walkMax is capped at 0.35 in CharacterScene for narrow viewports. */
 
   .cards-col {
     /* Stack full-width below the character, above the headline */
